@@ -27,9 +27,7 @@ const SpecializaitionModal: React.FC<ModalProps> = ({ handleToggelModal, openMod
 
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const handleSubmit = async (values: any, resetForm: any) => {
-        try {
-            console.log("valuesvaluesvalues" , values);
-            
+        try {            
             const token = localStorage.getItem(localStorageKeys.token)
             if (!token) {
                 throw new Error("Token is missing.")
@@ -57,12 +55,13 @@ const SpecializaitionModal: React.FC<ModalProps> = ({ handleToggelModal, openMod
             if (!updateRow) {
                 const formData = new FormData();
                 formData.append('diagnosticName', values.specialization);
+                formData.append('TestAmount', values.TestAmount);
                 if (values.image) {
                     formData.append('diagnosticImages', values.image);
                 }
                 const res = await Apiservice.postAuth(apiEndPoints.diagnostic.add, formData, token)
-                if (res && res.data.success) {
-                    toast.success("Specialization Added successfully")
+                if (res && res.data.status == 201) {
+                    toast.success(res.data.message)
                     resetForm()
                     getSpecailization()
                     handleToggelModal()
@@ -108,6 +107,7 @@ const SpecializaitionModal: React.FC<ModalProps> = ({ handleToggelModal, openMod
                     enableReinitialize
                     initialValues={{
                         specialization: updateRow ? updateRow.specialization : '',
+                        TestAmount : '',
                         image: null as File | null,
                     }}
                     validationSchema={getValidationSchema(updateRow)}
@@ -132,8 +132,22 @@ const SpecializaitionModal: React.FC<ModalProps> = ({ handleToggelModal, openMod
                                     />
                                     <ErrorMessage name="specialization" component="div" className="text-red-500 text-sm" />
                                 </div>
+                                {/*  */}
+                                <div>
+                                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                                        Test Amount
+                                    </label>
+                                    <Field
+                                        type="text"
+                                        placeholder = "Test Approx Amount"
+                                        name="TestAmount"
+                                        className={`w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
+                                    />
+                                    <ErrorMessage name="TestAmount" component="div" className="text-red-500 text-sm" />
+                                </div>
 
                                 {/* Image Field */}
+
                                 <div>
                                     <label className="mb-3 block text-sm font-medium text-black dark:text-white">
                                     Test Image

@@ -18,9 +18,20 @@
     list : "/diagnostic/list",
     delete : "/diagnostic/delete"
   },
+  ticket:{
+    add : "/ticket/add",
+    check : "/ticket/check",
+    checkPatientsTickets : "/ticket/checkPatientsTickets",
+    delete : "/ticket/delete",
+    edit : "/ticket/edit",
+
+    
+  },
   patient:{
     list:"/user/user-list",
-    toggle:"/user/enable-disable-user"
+    toggle:"/user/enable-disable-user",
+    get : "/patient/get",
+    delete : "/patient/delete"
   },
   doctorRegister : {
   add : "/user/doctor-register"

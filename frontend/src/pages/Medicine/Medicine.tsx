@@ -34,7 +34,6 @@ const MedicinePage: React.FC = () => {
   const [data, setData] = useState<object[]>([]);
   const [searchTerms, setSearchTerm] = useState<string>("")
   const token = localStorage.getItem(localStorageKeys.token);
-  console.log("datadatasorting" , sorting?.[0]);
   
   const Listbox = styled('ul')(
     () => `
@@ -121,6 +120,32 @@ const MedicinePage: React.FC = () => {
       accessorKey: 'medicineName',
       enableSorting: true,
       size: 120,
+      Cell: ({ cell }: { cell: { getValue: () => string | null } }) =>
+        cell.getValue() || 'N/A',
+    },
+    {
+      header: 'Medicine Stock',
+      accessorKey: 'medicineStock',
+      enableSorting: true,
+      size: 120,
+      Cell: ({ cell }: { cell: { getValue: () => number | null } }) =>
+        cell.getValue() ?? 'N/A',
+    },
+    {
+      header: 'Manufacturer Date',
+      accessorKey: 'medicineManufacturerDate',
+      enableSorting: true,
+      size: 120,
+      Cell: ({ cell }: { cell: { getValue: () => string | null } }) =>
+        cell.getValue() || 'N/A',
+    },
+    {
+      header: 'Expiry Date',
+      accessorKey: 'medicineExpiryDate',
+      enableSorting: true,
+      size: 120,
+      Cell: ({ cell }: { cell: { getValue: () => string | null } }) =>
+        cell.getValue() || 'N/A',
     },
     {
       header: 'Image',
@@ -129,8 +154,10 @@ const MedicinePage: React.FC = () => {
       size: 120,
       Cell: ({ cell }: { cell: { getValue: () => string | null } }) => {
         const imageUrl = cell.getValue();
-        const fullImageUrl = imageUrl ? `${imgBaseUrl}/${imageUrl}` : 'http://www.listercarterhomes.com/wp-content/uploads/2013/11/dummy-image-square.jpg';
-    
+        const fullImageUrl = imageUrl
+          ? `${imgBaseUrl}/${imageUrl}`
+          : 'http://www.listercarterhomes.com/wp-content/uploads/2013/11/dummy-image-square.jpg';
+  
         return (
           <img
             src={fullImageUrl}
@@ -174,6 +201,7 @@ const MedicinePage: React.FC = () => {
       ),
     },
   ];
+  
 
   const handleDelete = async (id: string | null) => {
     try {
@@ -202,8 +230,7 @@ const MedicinePage: React.FC = () => {
       let url = `${apiEndPoints.medicine.list}?search=${searchTerms ?? ""}&sortBy=${sorting[0]?.id ?? ""}&sortOrder=${sorting[0]?.desc ? "desc" : "asc"}&page=${pageState.pageIndex + 1}&perPage=${pageState.pageSize}`
       
       const res = await Apiservice.getAuth(url, token);
-      console.log("resresres" , res);
-      
+            
       if (res && res.data.status == 200) {
           
         // alert("hii");

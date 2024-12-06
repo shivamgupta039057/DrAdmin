@@ -27,6 +27,8 @@ const SpecializaitionModal: React.FC<ModalProps> = ({ handleToggelModal, openMod
 
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const handleSubmit = async (values: any, resetForm: any) => {
+        console.log("valuesvaluesvalues" , values);
+        
         try {
             const token = localStorage.getItem(localStorageKeys.token)
             if (!token) {
@@ -57,6 +59,11 @@ const SpecializaitionModal: React.FC<ModalProps> = ({ handleToggelModal, openMod
                 // formData.append("folderName", "specialization")
                 
                 formData.append('medicineName', values.specialization);
+                formData.append('medicineStock', values.stock);
+                formData.append('medicineManufacturerDate', values.manufacturerDate);
+                formData.append('medicineExpiryDate', values.expiryDate);
+
+
                 if (values.image) {
                     formData.append('medicineImages', values.image);
                 }
@@ -108,6 +115,9 @@ const SpecializaitionModal: React.FC<ModalProps> = ({ handleToggelModal, openMod
                     enableReinitialize
                     initialValues={{
                         specialization: updateRow ? updateRow.specialization : '',
+                        stock : '',
+                        manufacturerDate : '',
+                        expiryDate : '',
                         image: null as File | null,
                     }}
                     validationSchema={getValidationSchema(updateRow)}
@@ -127,11 +137,53 @@ const SpecializaitionModal: React.FC<ModalProps> = ({ handleToggelModal, openMod
                                     </label>
                                     <Field
                                         type="text"
+                                        placeholder="Medicine Name"
                                         name="specialization"
                                         className={`w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
                                     />
                                     <ErrorMessage name="specialization" component="div" className="text-red-500 text-sm" />
                                 </div>
+                                {/*  */}
+                                <div>
+                                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                                        Medicine Stock
+                                    </label>
+                                    <Field
+                                        type="text"
+                                        name="stock"
+                                         placeholder="Medicine Stock"
+                                        className={`w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
+                                    />
+                                    <ErrorMessage name="stock" component="div" className="text-red-500 text-sm" />
+                                </div>
+                                {/*  */}
+
+                                <div>
+                                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                                        Medicine Manufacturer Date
+                                    </label>
+                                    <Field
+                                        type="date"
+                                        name="manufacturerDate"
+                                         placeholder="Medicine Manufacturer Date"
+                                        className={`w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
+                                    />
+                                    <ErrorMessage name="manufacturerDate" component="div" className="text-red-500 text-sm" />
+                                </div>
+                                {/*  */}
+
+                                <div>
+                                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                                        Medicine Expiry Date
+                                    </label>
+                                    <Field
+                                        type="date"
+                                        name="expiryDate"
+                                        className={`w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
+                                    />
+                                    <ErrorMessage name="expiryDate" component="div" className="text-red-500 text-sm" />
+                                </div>
+                                {/*  */}
 
                                 {/* Image Field */}
                                 <div>

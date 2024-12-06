@@ -2,26 +2,30 @@ const Medicine = require("../models/medicine.models.js");
 
 const addMedicineControllers = async (req, res) => {
     try {
-        const { medicineName } = req.body;
+        const { medicineName , medicineStock , medicineManufacturerDate , medicineExpiryDate} = req.body;
         const fullPath = req.file?.path;
         const medicineImages = fullPath ? `uploads/${req.file.filename}` : null;
-
-        console.log("medicineImages", medicineImages);
 
         if (!medicineName) {
             return res.status(400).json({ message: "Medicine name is required" });
         }
-
-        if (!medicineImages) {
-            return res.status(400).json({ message: "Medicine image is required" });
+        if (!medicineStock) {
+            return res.status(400).json({ message: "Medicine stock is required" });
         }
-
+        if (!medicineManufacturerDate) {
+            return res.status(400).json({ message: "Medicine manufacturer date is required" });
+        }
+        if (!medicineExpiryDate) {
+            return res.status(400).json({ message: "Medicine expiry date is required" });
+        } 
         
-        
-        // Create a new medicine entry
         const newMedicine = new Medicine({
             medicineName,
             medicineImages,
+            medicineStock,
+            medicineManufacturerDate,
+            medicineExpiryDate
+
         });
 
         await newMedicine.save();
@@ -78,7 +82,6 @@ const getMedicinesController = async (req, res) => {
         let sort = {
             createdAt : -1
         };
-        console.log("sortsortsortsort" , sort);
         
         if (sortBy && sortOrder) {
             sort[sortBy] = sortOrder === 'asc' ? 1 : -1; 
@@ -115,7 +118,6 @@ const deleteMedicineController = async (req, res) => {
     try {
         const { id } = req.body;
 
-        // Validate that the ID is provided
         if (!id) {
             return res.status(400).json({
                 status: 400,
@@ -123,10 +125,8 @@ const deleteMedicineController = async (req, res) => {
             });
         }
 
-        // Find and delete the document
         const deletedMedicine = await Medicine.findByIdAndDelete(id);
 
-        // If no document is found to delete
         if (!deletedMedicine) {
             return res.status(404).json({
                 status: 404,
@@ -150,13 +150,6 @@ const deleteMedicineController = async (req, res) => {
 };
 
 
-
-// const deleteMedicineController = async (req , res) => {
-//     const { id } = req.body;
-
-//     console.log("idid" , id);
-    
-// }
 
 
 module.exports = { addMedicineControllers , getMedicinesController , deleteMedicineController };

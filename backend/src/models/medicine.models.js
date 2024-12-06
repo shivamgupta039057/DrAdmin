@@ -8,6 +8,18 @@ const MedicineSchema = new Schema({
     },
     medicineImages: {
         type: String,
+        required: false,
+    },
+    medicineStock: {
+        type: String,
+        required: true,
+    },
+    medicineManufacturerDate: {
+        type: String,
+        required: true,
+    },
+    medicineExpiryDate: {
+        type: String,
         required: true,
     },
 }, { timestamps: true });

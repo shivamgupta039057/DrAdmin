@@ -16,7 +16,8 @@ import State from '../pages/State/State.tsx';
 import City from '../pages/City/CityData.tsx';
 import MedicinePage from '../pages/Medicine/Medicine.tsx';
 import TestPage from '../pages/Test/Test.tsx';
-import ViewPatients from "../pages/ViewPatients/ViewPatients.jsx"
+import ViewPatients from "../pages/ViewPatients/ViewPatients.js"
+import ViewPrescription from "../pages/precription/viewPricription.jsx"
 
 function AllRoutes() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -36,6 +37,8 @@ function AllRoutes() {
     {path : ROUTES_CONST.PATIENT , component : Patient},
     {path : ROUTES_CONST.HOME , component : ECommerce},
     {path : `${ROUTES_CONST.VIEWPATIENT}/:patientId` , component : ViewPatients},
+    {path : `${ROUTES_CONST.VIEWPRESCRIPTION}/:prescriptionId` , component : ViewPrescription},
+
 
   ];
 

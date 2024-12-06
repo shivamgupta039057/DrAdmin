@@ -8,9 +8,7 @@ interface ProtectedProps {
 }
 
 const Protected: React.FC<ProtectedProps> = (props) => {
-  const {Component} = props
-  console.log("ComponentComponent" , Component, props);
-  
+  const {Component} = props  
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const navigate = useNavigate();
 

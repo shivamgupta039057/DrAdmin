@@ -12,5 +12,5 @@ export const ROUTES_CONST = {
   STATE : "/state",
   CITY : "/city",
   VIEWPATIENT : "/viewPatient",
-
+  VIEWPRESCRIPTION : "/viewPrescription"
 };

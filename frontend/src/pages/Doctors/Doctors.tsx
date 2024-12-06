@@ -43,57 +43,122 @@ const Doctors: React.FC = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [pageState, setPageState] = useState({ pageIndex: 0, pageSize: 10 });
   const [AddOpenModal , setAddOpenModal] = useState<boolean>(false);
-  // const [AddOpenModalData , setAddOpenModalData] = useState<object>({});
 
   const token = localStorage.getItem(localStorageKeys.token);
 const navigate = useNavigate(); 
 
 
 
+const Listbox = styled('ul')(
+  () => `
+    font-size: 0.875rem;
+    box-sizing: border-box;
+    padding: 12px;
+    margin: 12px 0;
+    min-width: 150px;
+    border-radius: 12px;
+    overflow: auto;
+    outline: 0px;
+    background : #fff;
+    border: 1px solid #DAE2ED;
+    color: #1C2025;
+    box-shadow: 0px 4px 6px 'rgba(0,0,0, 0.05)';
+    z-index: 1;
+    `,
+);
+
+
+
+const MenuItem = styled(BaseMenuItem)(
+  () => `
+    list-style: none;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+  
+    &:last-of-type {
+      border-bottom: none;
+    }
+  
+    &:focus {
+      outline: 3px solid #99CCF3;
+      background-color: #E5EAF2;
+      color: #1C2025;
+    }
+  
+    &.${menuItemClasses.disabled} {
+      color: #B0B8C4;
+    }
+    `,
+);
+
+const MenuButton = styled(BaseMenuButton)(
+  () => `
+    font-weight: 600;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    padding: 3px 6px;
+    border-radius: 8px;
+    color: white;
+    transition: all 150ms ease;
+    cursor: pointer;
+    color: #B0B8C4;
+  
+    &:hover {
+      background: #F3F6F9;
+      border-color: #C7D0DD;
+    }
+  
+    &:active {
+      background: #E5EAF2;
+    }
+  
+    &:focus-visible {
+      box-shadow: 0 0 0 4px #99CCF3;
+      outline: none;
+    }
+    `,
+);
+
 const columns = [
   {
     header: 'ID',
-    accessorKey: 'SrNo',
+    accessorKey: "SrNo",
     enableSorting: false,
     size: 70,
-    Cell: ({ cell }) => cell.getValue() || 'N/A',
+    Cell: ({ row }) =>
+      row.index + 1 + pageState.pageIndex * pageState.pageSize,
+    enableColumnActions: false,
+    enableSorting: false,
   },
   {
     header: 'Name Of Patient',
-    accessorKey: 'name',
-    enableSorting: false,
+    accessorKey: 'username',
+    enableSorting: true,
+    size: 100,
+    Cell: ({ cell }) => cell.getValue() || 'N/A',
+  },
+  {
+    header: 'Relationship',
+    accessorKey: 'relationship',
+    enableSorting: true,
     size: 100,
     Cell: ({ cell }) => cell.getValue() || 'N/A',
   },
   {
     header: 'Mobile No.',
     accessorKey: 'mobileNo',
-    enableSorting: false,
+    enableSorting: true,
     size: 100,
     Cell: ({ cell }) => cell.getValue() || 'N/A',
   },
   {
     header: 'Gender',
-    accessorKey: 'gender',
+    accessorKey: 'sex',
     enableSorting: false,
     size: 100,
     Cell: ({ cell }) => cell.getValue() || 'N/A',
-  },
-  {
-    header: 'Patient Date',
-    accessorKey: 'updatedAt',
-    enableSorting: false,
-    size: 100,
-    Cell: ({ cell }) => {
-      const value = cell.getValue();
-      if (!value) return 'N/A';
-      const date = new Date(value);
-      return date.toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      });
-    },
   },
   {
     header: 'Age',
@@ -110,74 +175,34 @@ const columns = [
     Cell: ({ cell }) => cell.getValue() || 'N/A',
   },
   {
-    header: 'Medicine',
-    accessorKey: 'medicine',
-    enableSorting: false,
-    size: 100,
-    Cell: ({ cell }) => cell.getValue() || 'N/A',
-  },
-  {
-    header: 'Diagnostics',
-    accessorKey: 'diagnostics',
-    enableSorting: false,
-    size: 100,
-    Cell: ({ cell }) => cell.getValue() || 'N/A',
-  },
-  {
-    header: 'Amount',
-    accessorKey: 'amount',
-    enableSorting: false,
-    size: 100,
-    Cell: ({ cell }) => cell.getValue() || 'N/A',
-  },
-  {
-    header: 'Description',
-    accessorKey: 'description',
-    enableSorting: false,
-    size: 100,
-    Cell: ({ cell }) => cell.getValue() || 'N/A',
-  },
-  {
-    header: 'Payment Reminder',
-    enableColumnActions: false,
-    enableSorting: false,
-    size: 150,
-    Cell: ({ row }) => (
-      <WhatsAppComponent
-      phoneNumber="9057280563"
-      message="Hello! Here is your prescription."
-      pdfLink="https://example.com/path-to-prescription.pdf"
-    />
-    ),
-  },
-  {
     header: 'Actions',
     accessorKey: '_id',
     size: 120,
     enableSorting: false,
-    Cell: ({ cell }) => {
-      console.log("cellcell" , cell);
-      
+    Cell: ({ cell }) => {      
       const id = cell.getValue();
       return id ? (
         <Dropdown>
           <MenuButton aria-label="More actions">
             <MoreHorizIcon />
           </MenuButton>
-          <Menu className="z-99999">
+          <Menu slots={{ listbox: Listbox }} className="z-99999">
             <MenuItem onClick={() => navigate(`${ROUTES_CONST.VIEWPATIENT}/${id}`)}>
               View
             </MenuItem>
             <MenuItem 
             onClick={() => {
               setAddOpenModal(prev => !prev);
-              setAddPatientsId(cell?.row?.original?._id)
+              setAddPatientsId(cell?.row?.original)
             }}
             >
               Add
             </MenuItem>
-            <MenuItem>Edit</MenuItem>
-            <MenuItem>Delete</MenuItem>
+            <MenuItem
+            onClick={() => {
+              handleDelete(cell?.row?.original._id);
+            }}
+            >Delete</MenuItem>
           </Menu>
         </Dropdown>
       ) : (
@@ -196,49 +221,43 @@ const columns = [
       }
 
 
-      let url = `${apiEndPoints.patient.list}?page=${pageState.pageIndex + 1}&perPage=${pageState.pageSize}&role=doctor`
+      let url = `${apiEndPoints.patient.get}?search=${searchTerms ?? ""}&sortBy=${sorting[0]?.id ?? ""}&sortOrder=${sorting[0]?.desc ? "desc" : "asc"}&page=${pageState.pageIndex + 1}&perPage=${pageState.pageSize}`
 
-      if (sorting.length) {
-        url = url + `&sortBy=${sorting[0]?.id}&sortOrder=${sorting[0]?.desc ? "desc" : "asc"}`
-      }
-      if (searchTerms) {
-        url = url + `&search=${searchTerms}`
-      }
-
-      const res = await Apiservice.getAuth(url, token)
-      if (res && res.data.success) {
-        const newarr = res.data.data.documents.map((obj: object, index: number) => {
-          return { ...obj, SrNo: index + 1 + pageState.pageIndex * pageState.pageSize }
-        })
-        setPatient(newarr)
-        setTotalPages(res.data.data.pagination?.totalChildrenCount);
+      const res = await Apiservice.getAuth(url, token);
+      
+      if (res && res.data.status == 200) {
+        
+        setPatient(res.data.data)
+        setTotalPages(res?.data?.pagination?.totalItems);
       }
     } catch (error) {
       console.log(error)
     }
   }
 
-
-  const blockHandler = async (id: string, status: boolean) => {
+  const handleDelete = async (id: string | null) => {
     try {
-
       if (!token) {
         throw new Error("Token is missing.")
       }
-
-      const url = `${apiEndPoints.patient.toggle}?id=${id}&status=${!status}`
-      const res = await Apiservice.getAuth(url, token)
-      if (res && res.data.success) {
+      const body = {
+        id: id
+      }
+      const res = await Apiservice.postAuth(apiEndPoints.patient.delete, body, token);      
+      if (res && res.data.status == 200) {
         toast.success(res.data.message)
         getPatient()
       }
     } catch (error) {
       console.log(error)
     }
+  
   }
 
+
+
   useEffect(() => {
-    getPatient()
+    getPatient();
   }, [pageState, sorting, searchTerms]);
 
   const AddDoctorModal = () => {

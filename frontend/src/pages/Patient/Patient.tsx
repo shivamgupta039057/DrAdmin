@@ -73,7 +73,6 @@ const Patient: React.FC = () => {
             }
 
             const res = await Apiservice.getAuth(url, token)
-            console.log({ res })
             if (res && res.data.success) {
                 const newarr = res.data.data.documents.map((obj: object, index: number) => {
                     return { ...obj, SrNo: index + 1 + pageState.pageIndex * pageState.pageSize }

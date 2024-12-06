@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import AddIcon from '@mui/icons-material/Add';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import { MaterialReactTable } from 'material-react-table';
-import { Apiservice } from '../../service/apiservice';
+import { Apiservice, imgBaseUrl } from '../../service/apiservice';
 import localStorageKeys from '../../constant/localStorageKeys';
 import apiEndPoints from '../../constant/apiendpoints';
 import AddTestModal from './AddTestModal';
@@ -24,7 +24,8 @@ interface UpdateRow {
 }
 
 const TestPage: React.FC = () => {
-  const [specializationList, setSpecializationList] = useState<object[]>([])
+  const [specializationList, setSpecializationList] = useState<object[]>([]);
+  const [data, setData] = useState<object[]>([]);
   const [pageState, setPageState] = useState({ pageIndex: 0, pageSize: 10 });
   const [totalPages, setTotalPages] = useState<number>(1);
   const [openModal, setOpenModal] = useState<boolean>(false)
@@ -109,26 +110,43 @@ const TestPage: React.FC = () => {
       header: 'ID',
       accessorKey: "SrNo",
       enableSorting: false,
-      size: 70
+      size: 70,
+      Cell: ({ row }) =>
+        row.index + 1 + pageState.pageIndex * pageState.pageSize,
+      enableColumnActions: false,
+      enableSorting: false,
     },
     {
       header: 'Test Name',
-      accessorKey: 'specialization',
+      accessorKey: 'diagnosticName',
       enableSorting: true,
       size: 120
     },
     {
+      header: 'Test Approx Price',
+      accessorKey: 'TestAmount',
+      enableSorting: true,
+      size: 120,
+      Cell: ({ cell }: { cell: { getValue: () => string | null } }) =>
+        cell.getValue() || 'N/A',
+    },
+    {
       header: 'Image',
-      accessorKey: 'image',
-      Cell: ({ cell }: { cell: { getValue: () => string | null } }) => (
-        <img
-          src={cell.getValue() || "http://www.listercarterhomes.com/wp-content/uploads/2013/11/dummy-image-square.jpg"}
-          alt="Specialization"
-          style={{ width: 50, height: 50, borderRadius: '4px' }} // Adjust styles as needed
-        />
-      ),
+      accessorKey: 'diagnosticImages',
       enableSorting: false,
-      size: 120
+      size: 120,
+      Cell: ({ cell }: { cell: { getValue: () => string | null } }) => {
+        const imageUrl = cell.getValue();
+        const fullImageUrl = imageUrl ? `${imgBaseUrl}/${imageUrl}` : 'http://www.listercarterhomes.com/wp-content/uploads/2013/11/dummy-image-square.jpg';
+    
+        return (
+          <img
+            src={fullImageUrl}
+            alt="Medicine"
+            style={{ width: 50, height: 50, borderRadius: '4px' }}
+          />
+        );
+      },
     },
     {
       accessorKey: '_id',
@@ -161,7 +179,6 @@ const TestPage: React.FC = () => {
       ),
     },
   ];
-
   const handleDelete = async (id: string | null) => {
     try {
       if (!token) {
@@ -170,8 +187,8 @@ const TestPage: React.FC = () => {
       const body = {
         id: id
       }
-      const res = await Apiservice.postAuth(apiEndPoints.specialization.delete, body, token)
-      if (res && res.data.success) {
+      const res = await Apiservice.postAuth(apiEndPoints.diagnostic.delete, body, token);      
+      if (res && res.data.status == 200) {
         toast.success("Delete Success")
         getSpecailization()
       }
@@ -186,21 +203,17 @@ const TestPage: React.FC = () => {
         throw new Error("Token is missing.")
       }
 
-      let url = `${apiEndPoints.specialization.list}?page=${pageState.pageIndex + 1}&perPage=${pageState.pageSize}`
-      if (sorting.length) {
-        url = url + `&sortBy=${sorting[0]?.id}&sortOrder=${sorting[0]?.desc ? "desc" : "asc"}`
-      }
-      if (searchTerms) {
-        url = url + `&search=${searchTerms}`
-      }
-      const res = await Apiservice.getAuth(url, token)
-      if (res && res.data.success) {
-
-        const newarr = res.data.data.documents.map((obj: object, index: number) => {
-          return { ...obj, SrNo: index + 1 + pageState.pageIndex * pageState.pageSize }
-        })
-        setSpecializationList(newarr)
-        setTotalPages(res.data.data.pagination?.totalChildrenCount);
+      let url = `${apiEndPoints.diagnostic.list}?search=${searchTerms ?? ""}&sortBy=${sorting[0]?.id ?? ""}&sortOrder=${sorting[0]?.desc ? "desc" : "asc"}&page=${pageState.pageIndex + 1}&perPage=${pageState.pageSize}`
+      
+      const res = await Apiservice.getAuth(url, token);      
+      if (res && res.data.status == 200) {
+          
+        // alert("hii");
+        setData(res.data.data);
+        setTotalPages(res.data.pagination.totalItems)
+       
+      }else{
+        setData([]);
       }
     } catch (error) {
 
@@ -209,7 +222,7 @@ const TestPage: React.FC = () => {
   }
   useEffect(() => {
     getSpecailization()
-  }, [pageState, sorting, searchTerms])
+  }, [pageState, sorting, searchTerms]);
   const handleToggelModal = () => {
     setOpenModal(prv => !prv)
   }
@@ -237,7 +250,7 @@ const TestPage: React.FC = () => {
       <div className="table-container capitalize">
         <MaterialReactTable
           columns={columns}
-          data={specializationList}
+          data={data}
           manualPagination
           manualSorting
           paginationDisplayMode={'pages'}
