@@ -10,13 +10,22 @@ const getPatients = async (req, res) => {
         } = req.query;
 
         const query = search
-            ? { mobileNo: { $regex: search, $options: 'i' } } 
-            : {};
+  ? {
+      $or: [
+        { mobileNo: { $regex: search, $options: 'i' } },
+        { username: { $regex: search, $options: 'i' } }
+      ]
+    }
+  : {};
+
 
         const pageNumber = parseInt(page, 10);
         const itemsPerPage = parseInt(perPage, 10);
 
-        const sort = {};
+        const sort = {
+            createdAt : -1
+        };
+        
         if (sortBy && sortOrder) {
             sort[sortBy] = sortOrder === 'asc' ? 1 : -1; 
         }

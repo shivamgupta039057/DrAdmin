@@ -78,6 +78,25 @@ export const Apiservice = {
             throw error;
         }
     },
+    postAPIAuthFormData: async (endpoint: string, body: Record<string, any>, token: string): Promise<AxiosResponse<ApiResponse> | undefined> => {
+        try {
+            const res = await axios.post(baseurl + endpoint, body, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${token}`,                    
+                },
+            });
+            if (res.data.success === false) {
+                toast.error(res.data.message);
+                return res;
+            }
+            return res;
+        } catch (error) {
+            const err = error as AxiosError
+            // toast.error(err.message);
+            throw error;
+        }
+    },
     postAPI : async (endpoint: string, body: Record<string, any>): Promise<AxiosResponse<ApiResponse> | undefined> => {
         try {
             const res = await axios.post("https://ecommerce.imgglobal.in/backend/" + endpoint, body);

@@ -4,6 +4,8 @@ const Ticket = require("../models/tickets.models");
 
 const createTicket = async (req, res) => {
   const { mobileNo, relationship, ticketData } = req.body;
+  console.log("ticketDataticketData" , ticketData);
+  
 
   try {
     let user = await User.findOne({ mobileNo, relationship });
@@ -49,6 +51,8 @@ const createTicket = async (req, res) => {
       amount: ticketData.amount,
       note: ticketData.note,
       ticketDescription: ticketData.ticketDescription,
+      finalDiagnostics : ticketData.finalDiagnostics,
+      doses : ticketData.doses
     });
 
     await newTicket.save();
@@ -103,6 +107,10 @@ const checkPatientsEdit = async (req, res) => {
     ticket.amount = ticketData.amount || ticket.amount;
     ticket.note = ticketData.note || ticket.note;
     ticket.ticketDescription = ticketData.ticketDescription || ticket.ticketDescription;
+    ticket.finalDiagnostics = ticketData.finalDiagnostics || ticket.finalDiagnostics;
+    ticket.doses = ticketData.doses || ticket.doses;
+
+
 
     await ticket.save();
 
@@ -223,6 +231,8 @@ const checkPatientsTickets = async (req, res) => {
           DiagnosticName: 1,
           amount: 1,
           note: 1,
+          doses : 1,
+          finalDiagnostics : 1,
           ticketDescription: 1,
           username: '$result.username',
           mobileNo: '$result.mobileNo',

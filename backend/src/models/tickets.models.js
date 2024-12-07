@@ -30,6 +30,14 @@ const TicketSchema = new Schema(
       type: String,  
       required: true,  
     },
+    finalDiagnostics : {
+      type : String,
+      require : true
+    },
+    doses : {
+      type : Object,
+      required : true
+    }
   },
   {
     timestamps: true, 

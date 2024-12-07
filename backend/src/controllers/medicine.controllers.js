@@ -1,10 +1,16 @@
 const Medicine = require("../models/medicine.models.js");
+const uploadOnCloudinary = require("../utils/cloudinary.js");
 
 const addMedicineControllers = async (req, res) => {
     try {
         const { medicineName , medicineStock , medicineManufacturerDate , medicineExpiryDate} = req.body;
         const fullPath = req.file?.path;
-        const medicineImages = fullPath ? `uploads/${req.file.filename}` : null;
+        if (!fullPath) {
+            return res.status(400).json({ message: "Image file is required" });
+        }
+        const newImageUrl = await uploadOnCloudinary(fullPath);
+        const medicineImages = newImageUrl.url
+        
 
         if (!medicineName) {
             return res.status(400).json({ message: "Medicine name is required" });

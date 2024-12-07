@@ -100,6 +100,8 @@ const AddDoctorRegistration: React.FC<ModalProps> = ({
   }, [updateRow]);
 
   const handleSubmit = async (values: any, { resetForm }: any) => {
+    console.log("valuesvalues" , values);
+    
     try {
 
       if (!token) {
@@ -126,6 +128,8 @@ const AddDoctorRegistration: React.FC<ModalProps> = ({
           amount: values.amount,
           note: values.note,
           ticketDescription: values.description,
+          finalDiagnostics : values.finalDiagnostics,
+          doses : values.doses,
           user: PatientsId?._id,
           ticketId : updateRow?._id
         },
@@ -265,7 +269,8 @@ const AddDoctorRegistration: React.FC<ModalProps> = ({
             />
           </DialogContent>
         </>
-      ) : isPatientsRegister === 'NotExist' ? (
+      ) 
+      : isPatientsRegister === 'NotExist' ? (
         <>
           <DialogContent>
             <NotExistPatientForm
@@ -276,7 +281,8 @@ const AddDoctorRegistration: React.FC<ModalProps> = ({
             />
           </DialogContent>
         </>
-      ) : (
+      ) 
+      : (
         <>
           <DialogContent>
             <DefaultPatients handleSubmitMobile={handleSubmitMobile} />

@@ -81,7 +81,7 @@ const NotExistPatientForm: React.FC<AddPatientFormProps> = ({
   updateRow
 }) => {
   const formik = useFormikContext<FormValues>();
-  console.log("formik" , formik);
+  console.log("updateRowformik" , updateRow);
   
 
   // useEffect(() => {
@@ -116,7 +116,11 @@ const NotExistPatientForm: React.FC<AddPatientFormProps> = ({
     note: updateRow?.note || '',
     relationship: PatientsId?.relationship || updateRow?.mobileNo || newUserData?.relationship || '',
     diagnostics:  [],
+    doses : updateRow?.doses || "",
+    finalDiagnostics : updateRow?.finalDiagnostics || ''
+
   }), [PatientsId, updateRow, newUserData]);
+
   
   
   return (
@@ -143,6 +147,8 @@ const NotExistPatientForm: React.FC<AddPatientFormProps> = ({
              const matchedItems = updateRow.medicineName.map((name) =>
                specializationList.find((item) => item.medicineName === name)
              ).filter(Boolean);
+            //  console.log("matchedItems" , matchedItems);
+             
              setFieldValue('specialization', matchedItems as Specialization[]);
            }
          }, [updateRow?.medicineName, specializationList, formik]);
@@ -304,9 +310,6 @@ const NotExistPatientForm: React.FC<AddPatientFormProps> = ({
                 // value={selectedSpecializations}
                 value={values.specialization}
                 onChange={(event, newValue) => {
-                  // console.log("newValue" , newValue);
-                  
-                  // setSelectedSpecializations(newValue);
                   setFieldValue('specialization', newValue);
                 }}
                 renderInput={(params) => (
@@ -318,6 +321,36 @@ const NotExistPatientForm: React.FC<AddPatientFormProps> = ({
                 )}
               />
             </div>
+
+            {/*  */}
+
+        
+          {values.specialization.map((item) => (
+            <div key={item.medicineName}>
+              <label className="mb-3 block text-sm font-medium text-black">
+              {item.medicineName.charAt(0).toUpperCase() + item.medicineName.slice(1)} Doses
+              </label>
+              <Field
+                name={`doses.${item.medicineName}`}
+                placeholder={`${item.medicineName} doses`}
+                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                value={values?.doses?.[item?.medicineName] || ""}
+                onChange={(e) =>
+                  setFieldValue(`doses.${item.medicineName}`, e.target.value)
+                }
+              />
+              <ErrorMessage
+                name={`doses.${item.medicineName}`}
+                component="div"
+                className="text-red-500 text-sm"
+              />
+            </div>
+          ))}
+
+        
+
+
+            {/*  */}
 
             {/* Diagnostics */}
             <div>
@@ -377,8 +410,26 @@ const NotExistPatientForm: React.FC<AddPatientFormProps> = ({
               />
             </div>
 
+             {/* finalDiagnostics */}
+             <div>
+              <label className="mb-3 block text-sm font-medium text-black">
+              Final Diagnostics
+              </label>
+              <Field
+                name="finalDiagnostics"
+                placeholder="Final Diagnostics"
+                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+              />
+              <ErrorMessage
+                name="finalDiagnostics"
+                component="div"
+                className="text-red-500 text-sm"
+              />
+            </div>
+
             {/* Description */}
           </div>
+          
           <div>
             <ReactQuill
               className="h-32 mt-4 mb-6"
@@ -392,6 +443,7 @@ const NotExistPatientForm: React.FC<AddPatientFormProps> = ({
               className="text-red-500 text-sm"
             />
           </div>
+
 
           {/* Submit Button */}
           <DialogActions>

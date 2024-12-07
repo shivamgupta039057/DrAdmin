@@ -155,7 +155,7 @@ const MedicinePage: React.FC = () => {
       Cell: ({ cell }: { cell: { getValue: () => string | null } }) => {
         const imageUrl = cell.getValue();
         const fullImageUrl = imageUrl
-          ? `${imgBaseUrl}/${imageUrl}`
+          ? `${imageUrl}`
           : 'http://www.listercarterhomes.com/wp-content/uploads/2013/11/dummy-image-square.jpg';
   
         return (

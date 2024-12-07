@@ -4,9 +4,12 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import './style.css';
 import { useLocation } from 'react-router-dom';
+import { Apiservice } from '../../service/apiservice';
+import localStorageKeys from '../../constant/localStorageKeys';
 import parse from 'html-react-parser';
 
 const ViewPrescription = () => {
+  const token = localStorage.getItem(localStorageKeys.token);
   const prescriptionRef = useRef(null);
   const location = useLocation();
   const rowData = location.state;
@@ -21,12 +24,46 @@ const ViewPrescription = () => {
       pdf.save('prescription.pdf');
     });
   };
+  console.log("rowData" , rowData);
+  
+
+  const handleDownloadAndSendWhatsApp = async () => {
+    const element = prescriptionRef.current;
+  
+    // Step 1: Generate PDF
+    const canvas = await html2canvas(element);
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+  
+    // Step 2: Convert PDF to Blob for upload
+    const pdfBlob = pdf.output('blob');
+
+    const formData = new FormData();
+    formData.append('file', pdfBlob, 'prescription.pdf');
+  
+    try {
+      const response = await Apiservice.postAPIAuthFormData('/upload/get',formData, token);
+      console.log("response" , response.data.data);
+      if(response.status === 200){
+        // alert("hii")
+        const whatsappNumber = rowData?.mobileNo;
+        const message = `Here is your prescription: ${response.data.data}`;
+        window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+      }
+     
+    } catch (error) {
+      console.error('Error uploading or sending message:', error);
+    }
+  };
 
   console.log('rowData', rowData);
-const medicineName = rowData?.medicineName?.map((item) => item)
+  const medicineName = rowData?.medicineName?.map((item) => item);
   return (
     <div className="container">
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-4">
         <button
           onClick={handleDownload}
           className="inline-flex items-center justify-center gap-2 rounded-md bg-black px-5 py-3 text-center font-medium text-white hover:bg-opacity-90"
@@ -35,6 +72,16 @@ const medicineName = rowData?.medicineName?.map((item) => item)
             <FaDownload />
           </span>
           Download Form
+        </button>
+        {/*  */}
+        <button
+          onClick={handleDownloadAndSendWhatsApp}
+          className="inline-flex items-center justify-center gap-2 rounded-md bg-black px-5 py-3 text-center font-medium text-white hover:bg-opacity-90"
+        >
+          <span>
+            <FaDownload />
+          </span>
+          Send WhatsApp
         </button>
       </div>
       <div className="prescription-card" ref={prescriptionRef}>
@@ -158,53 +205,91 @@ const medicineName = rowData?.medicineName?.map((item) => item)
             </div>
 
             {/* Prescription Content */}
+            {/* <div className='flex justify-between px-3'>
             <div className="rx-symbol">℞</div>
+            <div>
+              Doctor prescription :- {rowData.finalDiagnostics} 
+            </div>
+            </div> */}
+            <div className="flex items-center justify-between bg-gray-100 p-4 rounded-lg shadow-md">
+              <div className="rx-symbol">℞</div>
+              <div className="text-gray-800">
+                <span className="font-medium">Doctor prescription:</span>{' '}
+                <span className="font-extrabold text-[#0a2032]-900">
+                  {rowData?.finalDiagnostics}
+                </span>
+              </div>
+            </div>
+
             <div className="medicine-list">
-              {
-                rowData?.medicineName &&  <div class="medication-prescription-card">
-                <h1>Medication Details</h1>
-                <div class="medication-details">
-                  <p>
-                    <strong>Medication Name:</strong> {rowData?.medicineName?.map((item) => <span>{item},</span>)}
-                  </p>
-                  <p>
-                    <strong>Dosage:</strong> 1 capsule
-                  </p>
-                  <p>
-                    <strong>Frequency:</strong> Three times a day
-                    (morning, afternoon, evening)
-                  </p>
-                  {/* <p>
+              {rowData?.medicineName && (
+                <div class="medication-prescription-card">
+                  <h1>Medication Details</h1>
+                  <div class="medication-details">
+                    <p>
+                      <strong>Medication Name:</strong>{' '}
+                      {rowData?.medicineName?.map((item) => (
+                        <span>{item},</span>
+                      ))}
+                    </p>
+                    <p>
+                      <strong>Dosage:</strong>{' '}
+                      {Array.isArray(rowData?.doses)
+                        ? rowData?.doses.length > 0
+                          ? rowData?.doses.join(', ')
+                          : 'N/A'
+                        : typeof rowData?.doses === 'object' &&
+                          rowData?.doses !== null
+                        ? Object.entries(rowData?.doses)
+                            .map(([key, val]) => `${key}: ${val}`)
+                            .join(', ') || 'N/A'
+                        : rowData?.doses
+                        ? rowData?.doses
+                        : 'N/A'}
+                    </p>
+                    <p>
+                      <strong>Frequency:</strong> Three times a day (morning,
+                      afternoon, evening)
+                    </p>
+                    {/* <p>
                     <strong>Duration:</strong> 7 days
                   </p> */}
-                  <p>
-                    <strong>Instructions:</strong> Take after meals with
-                    a glass of water.
-                  </p>
+                    <p>
+                      <strong>Instructions:</strong> Take after meals with a
+                      glass of water.
+                    </p>
+                  </div>
                 </div>
-              </div>
-              }
-           
-                      {/*  */}
-                      {
-                        rowData?.DiagnosticName && <div class="diagnostic-card mt-5">
-                        <h1>Diagnostic Report</h1>
-                        <div class="test-details medication-details">
-                          <h2>MRI Test Details</h2>
-                          <p><strong>Test Name:</strong> {rowData?.DiagnosticName?.map((item) => <span>{item},</span>)}</p>
-                          {/* <p><strong>Patient Name:</strong> John Doe</p>
+              )}
+
+              {/*  */}
+              {rowData?.DiagnosticName && (
+                <div class="diagnostic-card mt-5">
+                  <h1>Diagnostic Report</h1>
+                  <div class="test-details medication-details">
+                    <h2>MRI Test Details</h2>
+                    <p>
+                      <strong>Test Name:</strong>{' '}
+                      {rowData?.DiagnosticName?.map((item) => (
+                        <span>{item},</span>
+                      ))}
+                    </p>
+                    {/* <p><strong>Patient Name:</strong> John Doe</p>
                           <p><strong>Date of Test:</strong> December 1, 2024</p> */}
-                          <p><strong>Diagnostic Center:</strong> City Diagnostics, New York</p>
-                          <p><strong>Impression:</strong> No evidence of abnormal mass or lesion. Normal ventricular system and brain parenchyma. No intracranial hemorrhage detected.</p>
-                        </div>
-                        {/* <div class="additional-notes">
-                          <h3>Additional Notes</h3>
-                          <p>Please consult your physician for a detailed interpretation of the MRI findings.</p>
-                        </div> */}
-                      </div>
-                      }
-                      
-  {/*  */}
+                    <p>
+                      <strong>Diagnostic Center:</strong> City Diagnostics, New
+                      York
+                    </p>
+                    <p>
+                      <strong>Impression:</strong> No evidence of abnormal mass
+                      or lesion. Normal ventricular system and brain parenchyma.
+                      No intracranial hemorrhage detected.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/*  */}
 
               {/*  */}
             </div>

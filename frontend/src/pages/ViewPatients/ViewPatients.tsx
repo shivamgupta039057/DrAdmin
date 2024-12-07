@@ -140,13 +140,50 @@ const ViewPatients: React.FC = () => {
     },
     {
       header: 'Medicine Name',
-      accessorKey: 'medicineName', // Correct accessor key for "Medicine Name"
+      accessorKey: 'medicineName', 
+      Cell: ({ cell }: { cell: { getValue: () => any } }) => {
+        const value = cell.getValue();
+    
+        if (Array.isArray(value)) {
+          return value.length > 0 ? value.join(', ') : 'N/A';
+        }
+        return 'N/A';
+      },
       enableSorting: true,
       size: 120,
     },
     {
+      header: 'Medicine Doses',
+      accessorKey: 'doses',
+      Cell: ({ cell }: { cell: { getValue: () => any } }) => {
+        const value = cell.getValue();
+    
+        if (Array.isArray(value)) {
+          return value.length > 0 ? value.join(', ') : 'N/A';
+        } else if (typeof value === 'object' && value !== null) {
+          return Object.entries(value)
+            .map(([key, val]) => `${key}: ${val}`)
+            .join(', ') || 'N/A';
+        } else if (value) {
+          return value;
+        }
+        return 'N/A';
+      },
+      enableSorting: true,
+      size: 120,
+    },    
+    {
+      header: 'Final Diagnostics',
+      accessorKey: 'finalDiagnostics', 
+      Cell: ({ cell }: { cell: { getValue: () => string | null } }) =>
+        cell.getValue() || 'N/A',
+      enableSorting: true,
+      size: 120,
+    },
+    
+    {
       header: 'Amount',
-      accessorKey: 'amount', // Correct accessor key for "Amount"
+      accessorKey: 'amount', 
       enableSorting: true,
       size: 120,
     },
