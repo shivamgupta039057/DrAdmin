@@ -170,7 +170,7 @@ const columns = [
   {
     header: 'Address',
     accessorKey: 'address',
-    enableSorting: false,
+    enableSorting: true,
     size: 100,
     Cell: ({ cell }) => cell.getValue() || 'N/A',
   },
@@ -231,7 +231,9 @@ const columns = [
         setTotalPages(res?.data?.pagination?.totalItems);
       }
     } catch (error) {
-      console.log(error)
+      // console.log(error , "eeeerrrrrrrrrr")
+      setPatient([]);
+        toast.error(error?.response.data.message)
     }
   }
 

@@ -114,7 +114,7 @@ const NotExistPatientForm: React.FC<AddPatientFormProps> = ({
     description: updateRow?.ticketDescription || '',
     amount: updateRow?.amount || '',
     note: updateRow?.note || '',
-    relationship: PatientsId?.relationship || updateRow?.mobileNo || newUserData?.relationship || '',
+    relationship: PatientsId?.relationship || updateRow?.relationship || newUserData?.relationship || '',
     diagnostics:  [],
     doses : updateRow?.doses || "",
     finalDiagnostics : updateRow?.finalDiagnostics || ''

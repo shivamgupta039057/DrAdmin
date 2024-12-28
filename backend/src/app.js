@@ -7,16 +7,13 @@ app.use(express.static("public"));
 app.use((req, res, next) => {
   next();
 });
-
 app.use(cors());
 app.use(express.json());
 app.use((req, res, next) => {
-  // res.setHeader("Referrer-Policy", "no-referrer-when-downgrade");
   next();
 });
 
 app.use(cookieParser());
-require('./routes')(app)
-// app.options("*", cors(corsOptions));
+require('./routes')(app);
 
 module.exports = { app }

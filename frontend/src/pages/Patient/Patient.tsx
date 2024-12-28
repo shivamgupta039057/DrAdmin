@@ -80,6 +80,9 @@ const Patient: React.FC = () => {
                 setPatient(newarr)
                 setTotalPages(res.data.data.pagination?.totalChildrenCount);
             }
+            else{
+                setPatient([])
+            }
         } catch (error) {
             console.log(error)
         }

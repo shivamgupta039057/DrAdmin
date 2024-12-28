@@ -7,8 +7,4 @@ app.use(`${prefix}/diagnostic`, require("./diagnostic.routes"));
 app.use(`${prefix}/ticket`, require("./ticket.routes"));
 app.use(`${prefix}/patient`, require("./patients.routes"));
 app.use(`${prefix}/upload`, require("./uploadRoutes.routes"));
-
-
-
-
 }

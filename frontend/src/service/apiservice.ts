@@ -42,7 +42,8 @@ export const Apiservice = {
             return res;
         } catch (error) {
             const err = error as AxiosError
-            toast.error(err.message)
+            // toast.error(err.message)
+            throw error;
         }
     },
 

@@ -4,12 +4,25 @@ const uploadOnCloudinary = require("../utils/cloudinary.js");
 const addMedicineControllers = async (req, res) => {
     try {
         const { medicineName , medicineStock , medicineManufacturerDate , medicineExpiryDate} = req.body;
-        const fullPath = req.file?.path;
-        if (!fullPath) {
-            return res.status(400).json({ message: "Image file is required" });
-        }
+        // const fullPath = req.file?.path;
+        // if (!fullPath) {
+        //     return res.status(400).json({ message: "Image file is required" });
+        // }
+        // const newImageUrl = await uploadOnCloudinary(fullPath);
+        // const medicineImages = newImageUrl.url
+        let medicineImages = null; // Default value if no image is uploaded
+
+if (req.file?.path) {
+    // If an image is uploaded, process it
+    const fullPath = req.file.path;
+    try {
         const newImageUrl = await uploadOnCloudinary(fullPath);
-        const medicineImages = newImageUrl.url
+        medicineImages = newImageUrl.url; // Assign the uploaded image URL
+    } catch (error) {
+        console.error("Error uploading image:", error);
+        return res.status(500).json({ message: "Image upload failed", error: error.message });
+    }
+}
         
 
         if (!medicineName) {
@@ -58,11 +71,14 @@ const getMedicinesController = async (req, res) => {
             sortBy = 'createdAt', 
             sortOrder = 'desc', 
             page = 1, 
-            perPage = 10 
+            perPage = 10 ,
+            flag
         } = req.query;
 
         const pageNumber = parseInt(page, 10);
         const itemsPerPage = parseInt(perPage, 10);
+        const showAllData = parseInt(flag) === 0;
+
 
         let query = {};
         if (search) {
@@ -85,18 +101,39 @@ const getMedicinesController = async (req, res) => {
             });
         }
 
-        let sort = {
-            createdAt : -1
-        };
+        // let sort = {
+        //     createdAt : -1
+        // };
         
-        if (sortBy && sortOrder) {
-            sort[sortBy] = sortOrder === 'asc' ? 1 : -1; 
+        // if (sortBy && sortOrder) {
+        //     sort[sortBy] = sortOrder === 'asc' ? 1 : -1; 
+        // }
+        const validSortFields = ['medicineName', 'medicineStock', 'medicineManufacturerDate' , 'medicineExpiryDate , createdAt' ]; // Replace with your schema fields
+        const normalizedSortOrder = sortOrder.toLowerCase() === 'asc' ? 1 : -1;
+        let sort = {};
+        
+        if (validSortFields.includes(sortBy)) {
+            sort[sortBy] = normalizedSortOrder;
+        } else {
+            sort['createdAt'] = -1; // Default sort
         }
+        
+        console.log("Sort Object:", sort);
+                
 
-        const medicines = await Medicine.find(query)
-            .sort(sort)
-            .skip((pageNumber - 1) * itemsPerPage)
-            .limit(itemsPerPage);
+        // const medicines = await Medicine.find(query)
+        //     .sort(sort)
+        //     .skip((pageNumber - 1) * itemsPerPage)
+        //     .limit(itemsPerPage);
+        let medicines;
+        if (showAllData) {
+            medicines = await Medicine.find(query).sort(sort);
+        } else {
+            medicines = await Medicine.find(query)
+                .sort(sort)
+                .skip((pageNumber - 1) * itemsPerPage)
+                .limit(itemsPerPage);
+        }
 
         return res.status(200).json({
             status: 200,

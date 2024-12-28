@@ -197,7 +197,7 @@ const AddDoctorRegistration: React.FC<ModalProps> = ({
         throw new Error('Token is missing.');
       }
 
-      const url = `${apiEndPoints.medicine.list}`;
+      const url = `${apiEndPoints.medicine.list}?flag=0`;
       const res = await Apiservice.getAuth(url, token);
 
       if (res && res.data.status === 200) {
@@ -217,7 +217,7 @@ const AddDoctorRegistration: React.FC<ModalProps> = ({
         throw new Error('Token is missing.');
       }
 
-      const url = `${apiEndPoints.diagnostic.list}`;
+      const url = `${apiEndPoints.diagnostic.list}?flag=0`;
       const res = await Apiservice.getAuth(url, token);
 
       if (res && res.data.status == 200) {

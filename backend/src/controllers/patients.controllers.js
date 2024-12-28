@@ -22,13 +22,24 @@ const getPatients = async (req, res) => {
         const pageNumber = parseInt(page, 10);
         const itemsPerPage = parseInt(perPage, 10);
 
-        const sort = {
-            createdAt : -1
-        };
+        // const sort = {
+        //     createdAt : -1
+        // };
         
-        if (sortBy && sortOrder) {
-            sort[sortBy] = sortOrder === 'asc' ? 1 : -1; 
+        // if (sortBy && sortOrder) {
+        //     sort[sortBy] = sortOrder === 'asc' ? 1 : -1; 
+        // }
+        const validSortFields = ['username', 'mobileNo', 'address' , 'createdAt', 'relationship']; // Replace with your schema fields
+        const normalizedSortOrder = sortOrder.toLowerCase() === 'asc' ? 1 : -1;
+        let sort = {};
+        
+        if (validSortFields.includes(sortBy)) {
+            sort[sortBy] = normalizedSortOrder;
+        } else {
+            sort['createdAt'] = -1; // Default sort
         }
+        
+        console.log("Sort Object:", sort);
 
         const totalItems = await User.countDocuments(query);
 

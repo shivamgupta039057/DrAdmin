@@ -170,13 +170,21 @@ const checkPatientsTickets = async (req, res) => {
     const validSortBy = sortBy && sortBy.trim() ? sortBy : 'createdAt';
 
     const searchQuery = search
-      ? { note : { $regex: search, $options: 'i' } }
+      ? { 
+        $or: [
+            { note: { $regex: search, $options: 'i' } },
+            { finalDiagnostics: { $regex: search, $options: 'i' } }
+        ]
+    }
       : {};
 
     const pageNumber = Math.max(parseInt(page, 10) || 1, 1);
     const itemsPerPage = Math.max(parseInt(perPage, 10) || 10, 1);
 
-    const sort = { [validSortBy]: sortOrder === 'asc' ? 1 : -1 };
+    // const sort = { [validSortBy]: sortOrder === 'asc' ? 1 : -1 };
+    const sort = {
+      [validSortBy]: sortOrder === 'asc' ? 1 : -1
+    };
 
     const totalItems = await Ticket.countDocuments({
       ...searchQuery,
@@ -217,6 +225,7 @@ const checkPatientsTickets = async (req, res) => {
                 sex: 1,
                 age: 1,
                 address: 1,
+                relationship : 1
               },
             },
           ],
@@ -239,6 +248,7 @@ const checkPatientsTickets = async (req, res) => {
           sex: '$result.sex',
           age: '$result.age',
           address: '$result.address',
+          relationship : `$result.relationship`
         },
       },
       { $sort: sort },

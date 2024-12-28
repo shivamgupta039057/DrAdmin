@@ -43,14 +43,18 @@ const getDiagnosticController = async (req, res) => {
     try {
         const { 
             search = '', 
-            sortBy = 'createdAt', 
+            sortBy = '', 
             sortOrder = 'desc', 
             page = 1, 
-            perPage = 10 
+            perPage = 10,
+            flag
         } = req.query;
 
         const pageNumber = parseInt(page, 10);
         const itemsPerPage = parseInt(perPage, 10);
+        const showAllData = parseInt(flag) === 0;
+        // console.log("showAllData" , showAllData);
+        
 
         let query = {};
         if (search) {
@@ -73,18 +77,41 @@ const getDiagnosticController = async (req, res) => {
             });
         }
 
-        let sort = {
-            createdAt : -1
-        };
+        // let sort = {
+        //     createdAt : -1
+        // };
         
-        if (sortBy && sortOrder) {
-            sort[sortBy] = sortOrder === 'asc' ? 1 : -1; 
-        }
+        // if (sortBy && sortOrder) {
+        //     sort[sortBy] = sortOrder === 'asc' ? 1 : -1; 
+        // }
 
-        const medicines = await Diagnostic.find(query)
-            .sort(sort)
-            .skip((pageNumber - 1) * itemsPerPage)
-            .limit(itemsPerPage);
+        // console.log("sortsortsort" , sort);
+        const validSortFields = ['diagnosticName', 'createdAt', 'TestAmount']; // Replace with your schema fields
+const normalizedSortOrder = sortOrder.toLowerCase() === 'asc' ? 1 : -1;
+let sort = {};
+
+if (validSortFields.includes(sortBy)) {
+    sort[sortBy] = normalizedSortOrder;
+} else {
+    sort['createdAt'] = -1; // Default sort
+}
+
+console.log("Sort Object:", sort);
+        
+
+        // const medicines = await Diagnostic.find(query)
+        //     .sort(sort)
+        //     .skip((pageNumber - 1) * itemsPerPage)
+        //     .limit(itemsPerPage);
+        let medicines;
+        if (showAllData) {
+            medicines = await Diagnostic.find(query).sort(sort);
+        } else {
+            medicines = await Diagnostic.find(query)
+                .sort(sort)
+                .skip((pageNumber - 1) * itemsPerPage)
+                .limit(itemsPerPage);
+        }
 
         return res.status(200).json({
             status: 200,
