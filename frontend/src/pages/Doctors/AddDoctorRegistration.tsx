@@ -130,6 +130,8 @@ const AddDoctorRegistration: React.FC<ModalProps> = ({
           ticketDescription: values.description,
           finalDiagnostics : values.finalDiagnostics,
           doses : values.doses,
+          doesTiming : values?.timing,
+          medicineDoesDays : values?.medicineDoesDays,
           user: PatientsId?._id,
           ticketId : updateRow?._id
         },

@@ -7,6 +7,7 @@ import { useLocation } from 'react-router-dom';
 import { Apiservice } from '../../service/apiservice';
 import localStorageKeys from '../../constant/localStorageKeys';
 import parse from 'html-react-parser';
+import MedicineList from './MedicineList';
 
 const ViewPrescription = () => {
   const token = localStorage.getItem(localStorageKeys.token);
@@ -60,7 +61,9 @@ const ViewPrescription = () => {
   };
 
   console.log('rowData', rowData);
-  const medicineName = rowData?.medicineName?.map((item) => item);
+  const date = new Date(rowData?.ticketDate);
+  const firstDate = new Date(date.getFullYear(), date.getMonth(), 1);
+  const formattedDate = `${firstDate.getDate().toString().padStart(2, '0')}-${(firstDate.getMonth() + 1).toString().padStart(2, '0')}-${firstDate.getFullYear()}`;
   return (
     <div className="container">
       <div className="flex justify-end gap-4">
@@ -200,68 +203,30 @@ const ViewPrescription = () => {
               </div>
               <div className="patient-info-row">
                 <div className="patient-info-label-date">Date:</div>
-                <div className="patient-info-value">{rowData?.ticketDate}</div>
+                <div className="patient-info-value">{formattedDate}</div>
               </div>
             </div>
 
             {/* Prescription Content */}
-            {/* <div className='flex justify-between px-3'>
-            <div className="rx-symbol">℞</div>
-            <div>
-              Doctor prescription :- {rowData.finalDiagnostics} 
-            </div>
-            </div> */}
-            <div className="flex items-center justify-between bg-gray-100 p-4 rounded-lg shadow-md">
+            <div className="block items-center p-4 rounded-lg">
               <div className="rx-symbol">℞</div>
               <div className="text-gray-800">
-                <span className="font-medium">Doctor prescription:</span>{' '}
-                <span className="font-extrabold text-[#0a2032]-900">
-                  {rowData?.finalDiagnostics}
+                <span className="text-md font-semibold text-[#0a2032]">Client Diagnosis :</span>{' '}
+                <span className="text-md font-normal gap-1 text-[#0a2032]-900">
+                  {rowData?.note.charAt(0).toUpperCase() + rowData?.note?.slice(1)}
+                </span>
+              </div>
+              <div className="text-gray-800 mt-1">
+                <span className="text-md font-semibold text-[#0a2032]">Diagnosis :</span>{' '}
+                <span className="text-md font-normal gap-1 text-[#0a2032]-900">
+                  {/* {rowData?.finalDiagnostics} */}
+                  {rowData?.finalDiagnostics?.charAt(0).toUpperCase() + rowData?.finalDiagnostics?.slice(1)}
                 </span>
               </div>
             </div>
 
             <div className="medicine-list">
-              {rowData?.medicineName && (
-                <div class="medication-prescription-card">
-                  <h1>Medication Details</h1>
-                  <div class="medication-details">
-                    <p>
-                      <strong>Medication Name:</strong>{' '}
-                      {rowData?.medicineName?.map((item) => (
-                        <span>{item},</span>
-                      ))}
-                    </p>
-                    <p>
-                      <strong>Dosage:</strong>{' '}
-                      {Array.isArray(rowData?.doses)
-                        ? rowData?.doses.length > 0
-                          ? rowData?.doses.join(', ')
-                          : 'N/A'
-                        : typeof rowData?.doses === 'object' &&
-                          rowData?.doses !== null
-                        ? Object.entries(rowData?.doses)
-                            .map(([key, val]) => `${key}: ${val}`)
-                            .join(', ') || 'N/A'
-                        : rowData?.doses
-                        ? rowData?.doses
-                        : 'N/A'}
-                    </p>
-                    <p>
-                      <strong>Frequency:</strong> Three times a day (morning,
-                      afternoon, evening)
-                    </p>
-                    {/* <p>
-                    <strong>Duration:</strong> 7 days
-                  </p> */}
-                    <p>
-                      <strong>Instructions:</strong> Take after meals with a
-                      glass of water.
-                    </p>
-                  </div>
-                </div>
-              )}
-
+              <MedicineList data={rowData}/>
               {/*  */}
               {rowData?.DiagnosticName && (
                 <div class="diagnostic-card mt-5">
@@ -274,8 +239,7 @@ const ViewPrescription = () => {
                         <span>{item},</span>
                       ))}
                     </p>
-                    {/* <p><strong>Patient Name:</strong> John Doe</p>
-                          <p><strong>Date of Test:</strong> December 1, 2024</p> */}
+                    
                     <p>
                       <strong>Diagnostic Center:</strong> City Diagnostics, New
                       York

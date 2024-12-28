@@ -52,7 +52,9 @@ const createTicket = async (req, res) => {
       note: ticketData.note,
       ticketDescription: ticketData.ticketDescription,
       finalDiagnostics : ticketData.finalDiagnostics,
-      doses : ticketData.doses
+      doses : ticketData.doses,
+      medicineDoesDays : ticketData.medicineDoesDays,
+      doesTiming : ticketData.doesTiming
     });
 
     await newTicket.save();
@@ -109,8 +111,8 @@ const checkPatientsEdit = async (req, res) => {
     ticket.ticketDescription = ticketData.ticketDescription || ticket.ticketDescription;
     ticket.finalDiagnostics = ticketData.finalDiagnostics || ticket.finalDiagnostics;
     ticket.doses = ticketData.doses || ticket.doses;
-
-
+    ticket.medicineDoesDays = ticketData.medicineDoesDays || ticket.medicineDoesDays;
+    ticket.doesTiming = ticketData.doesTiming || ticket.doesTiming;
 
     await ticket.save();
 
@@ -241,6 +243,8 @@ const checkPatientsTickets = async (req, res) => {
           amount: 1,
           note: 1,
           doses : 1,
+          doesTiming : 1,
+          medicineDoesDays : 1,
           finalDiagnostics : 1,
           ticketDescription: 1,
           username: '$result.username',

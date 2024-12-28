@@ -34,6 +34,14 @@ const TicketSchema = new Schema(
       type : String,
       require : true
     },
+    medicineDoesDays : {
+      type : String,
+      require : true
+    },
+    doesTiming : {
+      type : Object,
+      require : true
+    },
     doses : {
       type : Object,
       required : true
