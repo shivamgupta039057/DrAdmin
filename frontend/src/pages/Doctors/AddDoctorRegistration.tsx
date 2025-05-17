@@ -145,7 +145,8 @@ const AddDoctorRegistration: React.FC<ModalProps> = ({
       } else {
         res = await Apiservice.postAuth(apiEndPoints.ticket.add, param, token);
       }
-
+             console.log("ddddddddddresresres" , res);
+             
       if (res?.status == 200) {
         toast.success(res.data.message);
         resetForm();
@@ -153,7 +154,11 @@ const AddDoctorRegistration: React.FC<ModalProps> = ({
         getFunction();
         setIsPatientsRegister('');
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log("rorrrrrr" , error);
+      toast.error(error?.response?.data?.message)
+      
+    }
   };
 
   const handleSubmitMobile = async (values: any, { resetForm }: any) => {

@@ -18,6 +18,7 @@ import MedicinePage from '../pages/Medicine/Medicine.tsx';
 import TestPage from '../pages/Test/Test.tsx';
 import ViewPatients from "../pages/ViewPatients/ViewPatients.js"
 import ViewPrescription from "../pages/precription/viewPricription.jsx"
+import NotificationMedicine from '../pages/Medicine/NotificationMedicine.tsx';
 
 function AllRoutes() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -34,6 +35,7 @@ function AllRoutes() {
     { path: ROUTES_CONST.MEDICINE, component: MedicinePage },
     { path: ROUTES_CONST.TEST, component: TestPage },
     { path: ROUTES_CONST.DOCTOR, component: Doctors },
+    { path: ROUTES_CONST.MEDICINE_NOTIFICATION, component: NotificationMedicine },
     {path : ROUTES_CONST.PATIENT , component : Patient},
     {path : ROUTES_CONST.HOME , component : ECommerce},
     {path : `${ROUTES_CONST.VIEWPATIENT}/:patientId` , component : ViewPatients},

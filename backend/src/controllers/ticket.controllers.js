@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const User = require("../models/user.models");  
 const Ticket = require("../models/tickets.models"); 
+const Medicine = require("../models/medicine.models")
 
 const createTicket = async (req, res) => {
   const { mobileNo, relationship, ticketData } = req.body;
@@ -42,6 +43,24 @@ const createTicket = async (req, res) => {
         "User already exists with the same mobile number and relationship."
       );
     }
+
+       for (const medicineName of ticketData.medicineName) {        
+        const medicine = await Medicine.findOne({ medicineName: medicineName });
+        if (medicine) {
+          const quantity = ticketData.doses[medicineName];
+          const stock = Number(medicine.medicineStock); 
+            const qty = Number(quantity); 
+            if (stock >= qty) {            
+            medicine.medicineStock -= quantity;
+            await medicine.save();
+            console.log(`Updated stock for ${medicineName}, remaining stock: ${medicine.medicineStock}`);
+          } else {
+            return res.status(400).json({ message: `Not enough stock for ${medicineName}` });
+          }
+        } else {
+          return res.status(400).json({ message: `Medicine ${medicineName} not found.` });
+        }
+      }
 
     const newTicket = new Ticket({
       user: user.id,
@@ -115,6 +134,28 @@ const checkPatientsEdit = async (req, res) => {
     ticket.doesTiming = ticketData.doesTiming || ticket.doesTiming;
 
     await ticket.save();
+
+    // for (const medicineName of ticketData.medicineName) {
+    //   const medicine = await Medicine.findOne({ medicineName: medicineName });
+
+    //   if (medicine) {
+    //     const quantity = ticketData.doses[medicineName];
+    //     const stock = Number(medicine.medicineStock); // Convert stock to number
+    //     const qty = Number(quantity); // Convert quantity to number
+
+    //     // Check if enough stock is available
+    //     if (stock >= qty) {
+    //       medicine.medicineStock -= qty; // Deduct stock
+    //       await medicine.save(); // Save the updated medicine stock
+
+    //       console.log(`Updated stock for ${medicineName}, remaining stock: ${medicine.medicineStock}`);
+    //     } else {
+    //       return res.status(400).json({ message: `Not enough stock for ${medicineName}` });
+    //     }
+    //   } else {
+    //     return res.status(400).json({ message: `Medicine ${medicineName} not found.` });
+    //   }
+    // }
 
     res.status(200).json({
       message: "Ticket updated successfully",

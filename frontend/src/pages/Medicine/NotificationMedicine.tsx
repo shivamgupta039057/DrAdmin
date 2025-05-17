@@ -15,9 +15,7 @@ import styled from '@emotion/styled';
 import toast from 'react-hot-toast';
 import { MRT_SortingState } from 'material-react-table';
 import { MRT_ColumnDef } from 'material-react-table'; 
-import { ROUTES_CONST } from '../../constant/routeConstant';
-import { useNavigate } from 'react-router-dom';
-
+import { Link } from 'react-router-dom';
 
 interface UpdateRow {
   _id: string;
@@ -27,7 +25,7 @@ interface UpdateRow {
   updatedAt: string;
 }
 
-const MedicinePage: React.FC = () => {
+const NotificationMedicine: React.FC = () => {
   const [specializationList, setSpecializationList] = useState<object[]>([])
   const [pageState, setPageState] = useState({ pageIndex: 0, pageSize: 10 });
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -37,7 +35,6 @@ const MedicinePage: React.FC = () => {
   const [data, setData] = useState<object[]>([]);
   const [searchTerms, setSearchTerm] = useState<string>("")
   const token = localStorage.getItem(localStorageKeys.token);
-  const navigate = useNavigate();
   
   const Listbox = styled('ul')(
     () => `
@@ -236,9 +233,8 @@ const MedicinePage: React.FC = () => {
       const res = await Apiservice.getAuth(url, token);
             
       if (res && res.data.status == 200) {
-          
-        // alert("hii");
-        setData(res.data.data);
+        const filterNotificationData = res.data.data.filter((item) => item.medicineStock <= 50); 
+        setData(filterNotificationData);
         setTotalPages(res.data.pagination.totalItems)
        
       }else{
@@ -263,31 +259,11 @@ const MedicinePage: React.FC = () => {
   return (
     <>
       <div className="flex justify-between items-start sm:items-center mb-6 gap-3 flex-col sm:flex-row">
-        <Breadcrumb pageName="Medicine" />
-        <div className="flex gap-3">
-          <button
-            onClick={() => {
-              // ROUTES_CONST.MEDICINE_NOTIFICATION
-              navigate(ROUTES_CONST.MEDICINE_NOTIFICATION)
-            }}
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-black px-5 py-3 text-center font-medium text-white hover:bg-opacity-90"
-          >
-            <span>
-              <AddIcon />
-            </span>
-            Medicine Required
-          </button>
-          {/*  */}
-          <button
-            onClick={handleToggelModal}
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-black px-5 py-3 text-center font-medium text-white hover:bg-opacity-90"
-          >
-            <span>
-              <AddIcon />
-            </span>
-            Add Medicine
-          </button>
-          {/*  */}
+        <Breadcrumb pageName="Medicine Required" />
+        <div>
+          <Link to={"/medicine"}>
+          <button>back</button>
+          </Link>
         </div>
       </div>
       <div className="table-container capitalize">
@@ -297,7 +273,7 @@ const MedicinePage: React.FC = () => {
           manualPagination
           manualSorting
           paginationDisplayMode={'pages'}
-          rowCount={totalPages}
+          // rowCount={totalPages}
           onSortingChange={setSorting}
           manualFiltering={true}
           enableColumnFilters={false}
@@ -318,16 +294,8 @@ const MedicinePage: React.FC = () => {
           }}
         />
       </div>
-
-      <AddMedicineModal
-        handleToggelModal={handleToggelModal}
-        openModal={openModal}
-        updateRow={updateRow}
-        handleClearRow={handleClearRow}
-        getSpecailization={getSpecailization}
-      />
     </>
   )
 }
 
-export default MedicinePage
+export default NotificationMedicine

@@ -68,10 +68,13 @@ export const Apiservice = {
                     Authorization: `Bearer ${token}`,                    
                 },
             });
+            console.log("ffffffffffresresresresres" , res);
+            
             if (res.data.success === false) {
-                toast.error(res.data.message);
+                // toast.error(res.data.message);
                 return res;
             }
+            toast.success(res.data.message)
             return res;
         } catch (error) {
             const err = error as AxiosError
