@@ -176,7 +176,10 @@ const MedicinePage: React.FC = () => {
       accessorKey: '_id',
       size: 120,
       enableSorting: false,
-      Cell: ({ cell }: { cell: { getValue: () => string | null } }) => (
+      Cell: ({ cell }: { cell: { getValue: () => string | null } }) => {
+        console.log("sssssssssscellcellcell" , cell.row.original);
+        
+        return(
         <Dropdown>
           <MenuButton aria-label="More actions">
             <MoreHorizIcon />
@@ -184,10 +187,7 @@ const MedicinePage: React.FC = () => {
           <Menu slots={{ listbox: Listbox }} className="z-99999">
             <MenuItem
               onClick={() => {
-                const findObj = specializationList.find(
-                  (obj: MedicineData) => obj._id === cell.getValue()
-                );
-                setUpdateRow(findObj || undefined);
+                setUpdateRow(cell.row.original || undefined);
                 handleToggelModal();
               }}
             >
@@ -202,7 +202,8 @@ const MedicinePage: React.FC = () => {
             </MenuItem>
           </Menu>
         </Dropdown>
-      ),
+      )
+      },
     },
   ];
   

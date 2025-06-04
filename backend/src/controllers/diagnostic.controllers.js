@@ -3,8 +3,8 @@ const Diagnostic = require("../models/diagnostic.models.js");
 
 const addDiagnosticControllers = async (req, res) => {
     try {
-        const { diagnosticName , TestAmount } = req.body;
-        const fullPath = req.file?.path;        
+        const { diagnosticName, TestAmount } = req.body;
+        const fullPath = req.file?.path;
         const diagnosticImages = fullPath ? `uploads/${req.file.filename}` : null;
 
         if (!diagnosticName) {
@@ -14,8 +14,8 @@ const addDiagnosticControllers = async (req, res) => {
             return res.status(400).json({ message: "Amount is required" });
         }
 
-        
-        
+
+
         const newMedicine = new Diagnostic({
             diagnosticName,
             diagnosticImages,
@@ -41,11 +41,11 @@ const addDiagnosticControllers = async (req, res) => {
 
 const getDiagnosticController = async (req, res) => {
     try {
-        const { 
-            search = '', 
-            sortBy = '', 
-            sortOrder = 'desc', 
-            page = 1, 
+        const {
+            search = '',
+            sortBy = '',
+            sortOrder = 'desc',
+            page = 1,
             perPage = 10,
             flag
         } = req.query;
@@ -54,11 +54,11 @@ const getDiagnosticController = async (req, res) => {
         const itemsPerPage = parseInt(perPage, 10);
         const showAllData = parseInt(flag) === 0;
         // console.log("showAllData" , showAllData);
-        
+
 
         let query = {};
         if (search) {
-            query.diagnosticName = { $regex: search, $options: 'i' }; 
+            query.diagnosticName = { $regex: search, $options: 'i' };
         }
 
         const totalItems = await Diagnostic.countDocuments(query);
@@ -80,24 +80,24 @@ const getDiagnosticController = async (req, res) => {
         // let sort = {
         //     createdAt : -1
         // };
-        
+
         // if (sortBy && sortOrder) {
         //     sort[sortBy] = sortOrder === 'asc' ? 1 : -1; 
         // }
 
         // console.log("sortsortsort" , sort);
         const validSortFields = ['diagnosticName', 'createdAt', 'TestAmount']; // Replace with your schema fields
-const normalizedSortOrder = sortOrder.toLowerCase() === 'asc' ? 1 : -1;
-let sort = {};
+        const normalizedSortOrder = sortOrder.toLowerCase() === 'asc' ? 1 : -1;
+        let sort = {};
 
-if (validSortFields.includes(sortBy)) {
-    sort[sortBy] = normalizedSortOrder;
-} else {
-    sort['createdAt'] = -1; // Default sort
-}
+        if (validSortFields.includes(sortBy)) {
+            sort[sortBy] = normalizedSortOrder;
+        } else {
+            sort['createdAt'] = -1; // Default sort
+        }
 
-console.log("Sort Object:", sort);
-        
+        console.log("Sort Object:", sort);
+
 
         // const medicines = await Diagnostic.find(query)
         //     .sort(sort)
@@ -170,5 +170,60 @@ const deleteDiagnosticController = async (req, res) => {
     }
 };
 
+const updateDiagnosticController = async (req, res) => {
+    try {
+        const { id } = req.params;
 
-module.exports = { addDiagnosticControllers , getDiagnosticController , deleteDiagnosticController };
+        if (!id) {
+            return res.status(400).json({
+                status: 400,
+                message: "Diagnostic ID is required",
+            });
+        }
+
+        const { diagnosticName, TestAmount } = req.body
+
+        const UpdatedDiagnostic = await Diagnostic.findByIdAndDelete(id);
+
+
+        if (!UpdatedDiagnostic) {
+            return res.status(404).json({
+                status: 404,
+                message: "Diagnostic not found",
+            });
+        }
+
+        let medicineImages = UpdatedDiagnostic.diagnosticImages;
+        if (req.file?.path) {
+            try {
+                const uploaded = await uploadOnCloudinary(req.file.path);
+                medicineImages = uploaded.url;
+            } catch (error) {
+                console.error("Cloudinary upload error:", error);
+                return res.status(500).json({ message: "Failed to upload image" });
+            }
+        }
+
+        UpdatedDiagnostic.TestAmount = TestAmount
+        UpdatedDiagnostic.diagnosticName = diagnosticName
+
+        await UpdatedDiagnostic.save();
+
+
+        return res.status(200).json({
+            status: 200,
+            message: "Diagnostic Updated successfully",
+            data: UpdatedDiagnostic,
+        });
+    } catch (error) {
+        console.error("Error Updated Diagnostic:", error);
+        return res.status(500).json({
+            status: 500,
+            message: "Internal server error",
+            error: error.message,
+        });
+    }
+};
+
+
+module.exports = { addDiagnosticControllers, getDiagnosticController, deleteDiagnosticController, updateDiagnosticController };

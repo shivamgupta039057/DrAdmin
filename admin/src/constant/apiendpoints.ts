@@ -11,7 +11,8 @@
   medicine:{
     add : "/medicine/add",
     list : "/medicine/list",
-    delete : "/medicine/delete"
+    delete : "/medicine/delete",
+    update : "/medicine/update",
   },
   diagnostic:{
     add : "/diagnostic/add",

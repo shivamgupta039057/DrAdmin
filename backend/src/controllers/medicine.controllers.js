@@ -192,7 +192,68 @@ const deleteMedicineController = async (req, res) => {
     }
 };
 
+const updateMedicineController = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        console.log("ididididididididid" , id);
+        
+
+        if (!id) {
+            return res.status(400).json({ message: "Medicine ID is required" });
+        }
+
+        const {
+            medicineName,
+            medicineStock,
+            medicineManufacturerDate,
+            medicineExpiryDate
+        } = req.body;
+
+        const medicine = await Medicine.findById(id);
+        if (!medicine) {
+            return res.status(404).json({ message: "Medicine not found" });
+        }
+
+        let medicineImages = medicine.medicineImages; 
+        if (req.file?.path) {
+            try {
+                const uploaded = await uploadOnCloudinary(req.file.path);
+                medicineImages = uploaded.url;
+            } catch (error) {
+                console.error("Cloudinary upload error:", error);
+                return res.status(500).json({ message: "Failed to upload image" });
+            }
+        }
+
+        // Update fields
+        medicine.medicineName = medicineName || medicine.medicineName;
+        medicine.medicineStock = medicineStock || medicine.medicineStock;
+        medicine.medicineManufacturerDate = medicineManufacturerDate || medicine.medicineManufacturerDate;
+        medicine.medicineExpiryDate = medicineExpiryDate || medicine.medicineExpiryDate;
+        medicine.medicineImages = medicineImages;
+
+        await medicine.save();
+
+        return res.status(200).json({
+            status: 200,
+            message: "Medicine updated successfully",
+            data: medicine,
+            success : true
+        });
+    } catch (error) {
+        console.error("Error updating medicine:", error);
+        return res.status(500).json({
+            status: 500,
+            message: "Internal server error",
+            error: error.message,
+        });
+    }
+};
 
 
 
-module.exports = { addMedicineControllers , getMedicinesController , deleteMedicineController };
+
+
+module.exports = { addMedicineControllers , getMedicinesController , deleteMedicineController , updateMedicineController };
+

@@ -17,7 +17,10 @@ interface ModalProps {
     updateRow: {
         _id: string,
         image: string | null,
-        specialization: string,
+        medicineName: string,
+        medicineManufacturerDate: string,
+        medicineExpiryDate: string,
+        medicineStock: string,
         createdAt: string,
         updatedAt: string
     } | undefined
@@ -25,10 +28,13 @@ interface ModalProps {
 
 const SpecializaitionModal: React.FC<ModalProps> = ({ handleToggelModal, openModal, updateRow, handleClearRow, getSpecailization }) => {
 
+    console.log("updateRowupdateRow", updateRow);
+
+
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const handleSubmit = async (values: any, resetForm: any) => {
-        console.log("valuesvaluesvalues" , values);
-        
+        console.log("valuesvaluesvalues", updateRow);
+
         try {
             const token = localStorage.getItem(localStorageKeys.token)
             if (!token) {
@@ -37,14 +43,15 @@ const SpecializaitionModal: React.FC<ModalProps> = ({ handleToggelModal, openMod
             if (updateRow) {
                 const formData = new FormData();
                 // formData.append("folderName", "specialization")
-                if (values.specialization) {
-                    formData.append('medicineName', values.specialization);
-                }
+                formData.append('medicineName', values.specialization);
+                formData.append('medicineStock', values.stock);
+                formData.append('medicineManufacturerDate', values.manufacturerDate);
+                formData.append('medicineExpiryDate', values.expiryDate);
                 if (values.image) {
                     formData.append('medicineImages', values.image);
                 }
-                formData.append('id', updateRow?._id)
-                const res = await Apiservice.postAuth(apiEndPoints.specialization.edit, formData, token)
+                // formData.append('id', updateRow?._id)
+                const res = await Apiservice.postAuth(`${apiEndPoints.medicine.update}/${updateRow._id}`, formData, token)
                 if (res && res.data.success) {
                     toast.success("Medicine Edit successfully")
                     resetForm()
@@ -57,7 +64,7 @@ const SpecializaitionModal: React.FC<ModalProps> = ({ handleToggelModal, openMod
             if (!updateRow) {
                 const formData = new FormData();
                 // formData.append("folderName", "specialization")
-                
+
                 formData.append('medicineName', values.specialization);
                 formData.append('medicineStock', values.stock);
                 formData.append('medicineManufacturerDate', values.manufacturerDate);
@@ -91,7 +98,7 @@ const SpecializaitionModal: React.FC<ModalProps> = ({ handleToggelModal, openMod
     return (
         <Dialog open={openModal} fullWidth={true} maxWidth={'md'}>
             <DialogTitle>
-                {updateRow ? "Edit": "Add"} Medicine 
+                {updateRow ? "Edit" : "Add"} Medicine
             </DialogTitle>
             <IconButton
                 onClick={() => {
@@ -114,10 +121,10 @@ const SpecializaitionModal: React.FC<ModalProps> = ({ handleToggelModal, openMod
                 <Formik
                     enableReinitialize
                     initialValues={{
-                        specialization: updateRow ? updateRow.specialization : '',
-                        stock : '',
-                        manufacturerDate : '',
-                        expiryDate : '',
+                        specialization: updateRow ? updateRow.medicineName : '',
+                        stock: updateRow ? updateRow.medicineStock : '',
+                        manufacturerDate: updateRow ? updateRow.medicineManufacturerDate : '',
+                        expiryDate: updateRow ? updateRow.medicineExpiryDate : '',
                         image: null as File | null,
                     }}
                     validationSchema={getValidationSchema(updateRow)}
@@ -151,7 +158,7 @@ const SpecializaitionModal: React.FC<ModalProps> = ({ handleToggelModal, openMod
                                     <Field
                                         type="text"
                                         name="stock"
-                                         placeholder="Medicine Stock"
+                                        placeholder="Medicine Stock"
                                         className={`w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
                                     />
                                     <ErrorMessage name="stock" component="div" className="text-red-500 text-sm" />
@@ -165,7 +172,7 @@ const SpecializaitionModal: React.FC<ModalProps> = ({ handleToggelModal, openMod
                                     <Field
                                         type="date"
                                         name="manufacturerDate"
-                                         placeholder="Medicine Manufacturer Date"
+                                        placeholder="Medicine Manufacturer Date"
                                         className={`w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary`}
                                     />
                                     <ErrorMessage name="manufacturerDate" component="div" className="text-red-500 text-sm" />
@@ -188,7 +195,7 @@ const SpecializaitionModal: React.FC<ModalProps> = ({ handleToggelModal, openMod
                                 {/* Image Field */}
                                 <div>
                                     <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-                                    Medicine Image
+                                        Medicine Image
                                     </label>
                                     <input
                                         type="file"
@@ -218,7 +225,7 @@ const SpecializaitionModal: React.FC<ModalProps> = ({ handleToggelModal, openMod
                                     type="submit"
                                     className="flex w-full mt-5 mx-auto max-w-[350px] justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
                                 >
-                                    {updateRow ? "Edit": "Add"} Medicine
+                                    {updateRow ? "Edit" : "Add"} Medicine
                                 </button>
                             </DialogActions>
                         </Form>
